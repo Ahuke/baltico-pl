@@ -1,0 +1,27 @@
+.button {
+  padding: 16px 48px;
+  background: var(--gradient-offer);
+  background-size: 200% 200%;
+  color: var(--color-navy);
+  border: none;
+  border-radius: 50px; /* Pill shape */
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+/* Subtelny glow pod spodem */
+.glow {
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: var(--gradient-offer);
+  border-radius: 50px;
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0.6;
+}

@@ -1,0 +1,253 @@
+/* src/sections/OfferModal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  
+  /* KROK 5: WYŁĄCZAMY CIĘŻKI BLUR */
+  /* backdrop-filter: blur(8px); <--- To zabijało wydajność */
+  
+  /* Zamiast tego dajemy mocniejsze krycie tła */
+  background: rgba(10, 25, 47, 0.96); 
+}
+
+.modal {
+  width: 100%;
+  max-width: 1000px;
+  height: 85vh;
+  background: var(--color-navy);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px; height: 40px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  
+  /* Tu blur jest okej, bo element jest malutki */
+  backdrop-filter: blur(4px); 
+}
+
+.closeButton:hover {
+  background: var(--color-turquoise);
+  color: var(--color-navy);
+  transform: rotate(90deg);
+}
+
+/* --- LEWA STRONA: GALERIA --- */
+.galleryColumn {
+  width: 55%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainImageWrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+/* --- PRAWA STRONA: TREŚĆ --- */
+.contentColumn {
+  width: 45%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate) transparent;
+}
+
+.locationBadge {
+  color: var(--color-turquoise);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: var(--color-off-white);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 1.5rem;
+  color: var(--color-gold);
+  font-weight: 600;
+  margin-bottom: 2rem;
+  display: inline-block;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 5px;
+}
+
+.description {
+  color: var(--color-slate);
+  line-height: 1.8;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.featuresTitle {
+  color: var(--color-off-white);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.featuresGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 3rem;
+}
+
+.featureTag {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--color-off-white);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footerActions {
+  margin-top: auto; 
+}
+
+/* --- FORMULARZ REZERWACJI --- */
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  color: var(--color-off-white);
+  margin-bottom: 5px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 15px;
+}
+
+.inputGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--color-turquoise);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 15px;
+  border-radius: 8px;
+  color: var(--color-off-white);
+  font-family: var(--font-main);
+  outline: none;
+  transition: 0.3s;
+}
+
+.input:focus {
+  border-color: var(--color-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.summaryBox {
+  background: rgba(100, 255, 218, 0.05);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.totalPriceValue {
+  color: var(--color-gold);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.buttonsRow {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.backButtonLink {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-slate);
+  padding: 0 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.backButtonLink:hover {
+  border-color: var(--color-off-white);
+  color: var(--color-off-white);
+}
+
+@media (max-width: 900px) {
+  .modal {
+    flex-direction: column;
+    height: 100%;
+    border-radius: 0;
+    max-width: none;
+  }
+  .galleryColumn { width: 100%; height: 35vh; }
+  .contentColumn { width: 100%; height: 65vh; padding: 25px; }
+  .title { font-size: 1.8rem; }
+  .inputRow { flex-direction: column; gap: 10px; }
+}

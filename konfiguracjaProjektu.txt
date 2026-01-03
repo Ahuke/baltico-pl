@@ -1,0 +1,50 @@
+Jak uruchomić projekt baltico-pl
+Oto krótka instrukcja dla wszystkich dołączających do projektu. Projekt jest oparty na Vite i korzysta z React 19.
+
+1. Wymagania wstępne
+Upewnijcie się, że macie zainstalowane Node.js. Zalecana wersja: Node v20 (LTS) lub nowszy.
+
+Sprawdź wersję: node -v
+
+2. Instalacja zależności
+Po pobraniu repozytorium (git clone), otwórz terminal w folderze projektu i wpisz:
+
+Bash
+
+npm install
+(Ta komenda pobierze wszystkie biblioteki zdefiniowane w pliku package.json i utworzy folder node_modules).
+
+3. Uruchomienie projektu (Tryb developerski)
+Aby rozpocząć pracę i odpalić serwer lokalny:
+
+Bash
+
+npm run dev
+Kliknij link, który pojawi się w terminalu (zazwyczaj http://localhost:5173).
+
+🛠 Z czego korzystamy?
+W projekcie są już zainstalowane kluczowe biblioteki, więc nie musicie ich instalować ręcznie. Oto do czego służą:
+
+Routing: react-router-dom (wersja 7) – nawigacja między podstronami.
+
+Animacje: Mamy aż dwie biblioteki:
+
+framer-motion – główne animacje komponentów i przejść stron.
+
+gsap – do bardziej zaawansowanych sekwencji animacji.
+
+Style: clsx – mała biblioteka do warunkowego łączenia klas CSS (np. className={clsx('btn', isActive && 'btn-active')}).
+
+💡 Najczęstsze problemy
+Jeśli po zrobieniu git pull projekt sypie błędami:
+
+Skasuj folder node_modules.
+
+Wpisz ponownie npm install.
+
+Odpal npm run dev.
+
+Inne przydatne komendy
+npm run build – buduje wersję produkcyjną (sprawdza typy TypeScript i tworzy folder dist).
+
+npm run lint – sprawdza błędy w kodzie (ESLint).

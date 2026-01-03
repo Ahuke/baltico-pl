@@ -1,0 +1,231 @@
+/* src/sections/OffersCarousel.module.css */
+
+.section {
+  position: relative;
+  width: 100%;
+  height: 85vh;
+  min-height: 600px;
+  background-color: var(--color-navy);
+  overflow: hidden; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  
+  /* Dodajemy perspektywę, żeby transformacje 3D wyglądały głębiej */
+  perspective: 1000px;
+}
+
+.headingWrapper {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+
+.headline {
+  color: var(--color-off-white);
+  font-size: 2.5rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* --- TOR (TRACK) --- */
+.track {
+  display: flex;
+  height: 100%;
+  width: max-content;
+  
+  /* KLUCZOWA ZMIANA 1: Centrowanie w pionie flexboxem zamiast margin-top */
+  align-items: center; 
+  
+  /* Dodajemy padding z lewej, żeby pierwsza karta nie była przyklejona do krawędzi */
+  padding-left: 5vw; 
+  
+  will-change: transform;
+  /* Żeby karty mogły nachodzić na siebie, track musi pozwalać na 3D context */
+  transform-style: preserve-3d; 
+}
+
+/* --- KARTA OFERTY --- */
+.card {
+  position: relative;
+  
+  /* Rozmiary */
+  width: 28vw;
+  min-width: 380px;
+  max-width: 600px;
+  
+  /* KLUCZOWA ZMIANA 2: Mniejsza wysokość bazowa (75%), żeby po powiększeniu (scale) 
+     karta nie ucinała się na górze/dole sekcji */
+  height: 75%; 
+  
+  /* Usuwamy margin-top, flexbox (align-items: center) w .track to załatwił */
+  margin-top: 0; 
+  margin-right: -20px; /* Ujemny margines sprawia, że karty lekko na siebie nachodzą domyślnie (opcjonalne, daje efekt talii kart) */
+  /* Jeśli wolisz odstępy, daj tutaj np. margin-right: 30px; */
+  
+  /* Wygląd */
+  border-radius: 16px;
+  background-color: #000;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-soft);
+  
+  /* Zachowanie */
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+  
+  /* Animacja */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
+  /* Ważne: domyślny z-index niski */
+  z-index: 1; 
+  
+  /* Optymalizacja */
+  transform: translateZ(0); 
+}
+
+/* --- ZACHOWANIE HOVER (GŁĘBIA) --- */
+.card:hover {
+  /* 1. Powiększenie - wystarczająco duże, by przykryć sąsiadów */
+  transform: scale(1.1) translateY(-10px); 
+  
+  /* 2. Wyciągnięcie na sam wierzch - to sprawia, że karta przykrywa sąsiadów */
+  z-index: 100; 
+  
+  /* 3. Mocny cień rzucany "na ekran" i na sąsiadów */
+  box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.7);
+  
+  /* 4. Podświetlenie ramki */
+  border-color: rgba(100, 255, 218, 0.5);
+}
+
+.track:has(.card:hover) .card:not(:hover) {
+  /* Lekkie rozmycie i przyciemnienie kart, na które NIE najeżdżamy */
+  filter: brightness(0.7) blur(1px);
+  transform: scale(0.95); /* Sąsiedzi lekko się cofają */
+  transition: all 0.4s ease; /* Dodajemy płynność powrotu */
+}
+
+/* --- ZDJĘCIE (ZOOM WEWNĄTRZ) --- */
+.cardBackground {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.card:hover .cardBackground {
+  transform: scale(1.15);
+}
+
+/* --- TREŚĆ KARTY --- */
+.contentOverlay {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 80%;
+  background: linear-gradient(
+    to top,
+    rgba(10, 25, 47, 1) 0%,
+    rgba(10, 25, 47, 0.9) 25%,
+    rgba(10, 25, 47, 0) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 40px 30px;
+  z-index: 2;
+  transition: padding-bottom 0.4s ease;
+}
+
+.card:hover .contentOverlay {
+  padding-bottom: 50px; /* Uniesienie tekstów */
+}
+
+/* Tagi, tytuły, ceny - bez większych zmian, tylko kosmetyka */
+.tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: rgba(100, 255, 218, 0.15);
+  color: var(--color-turquoise);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cardTitle {
+  font-size: 2rem;
+  color: var(--color-off-white);
+  margin: 0 0 5px 0;
+  font-family: var(--font-header);
+  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.price {
+  font-size: 1.2rem;
+  color: var(--color-gold);
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.description {
+  color: var(--color-slate);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 95%;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+  .section {
+    height: 65vh;
+  }
+  
+  .card {
+    width: 85vw;
+    min-width: 300px;
+    height: 70%; /* Na mobile jeszcze trochę mniejsze, żeby łatwiej przewijać */
+    margin-right: 15px; /* Na mobile lepiej mieć odstępy */
+  }
+
+  .cardTitle {
+    font-size: 1.5rem;
+  }
+  
+  .headline {
+    font-size: 1.8rem;
+  }
+  
+  /* Na dotykowych ekranach wyłączamy efekty hover, bo mogą mylić */
+  .track:hover .card:not(:hover) {
+    filter: none;
+    transform: none;
+  }
+}

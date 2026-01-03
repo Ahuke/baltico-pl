@@ -1,0 +1,234 @@
+/* src/components/AuthModal.module.css */
+
+/* --- TŁO / OVERLAY --- */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  /* Przyciemnienie reszty strony */
+  background: rgba(10, 25, 47, 0.7); 
+  backdrop-filter: blur(8px); /* Rozmycie strony pod spodem */
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* Margines bezpieczeństwa na mobile */
+}
+
+/* --- KARTA MODALA --- */
+.modalCard {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  
+  /* Responsywność: jeśli ekran jest niski, pozwalamy na scroll wewnątrz karty */
+  max-height: 90vh; 
+  overflow-y: auto; 
+  overflow-x: hidden; /* Ukrywamy kropki wychodzące na boki */
+
+  background: rgba(10, 25, 47, 0.95); /* Ciemne tło pod kropkami */
+  border-radius: 20px;
+  
+  /* Domyślna ramka (Złota - Login), zmieniana klasą .registerMode */
+  border: 1px solid var(--color-gold); 
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  transition: border-color 0.5s ease;
+
+  transform: translateZ(0); 
+  will-change: transform, opacity;
+
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+/* Ukrywamy systemowy scrollbar wewnątrz karty dla estetyki */
+.modalCard::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Zmiana koloru ramki przy rejestracji */
+.modalCard.registerMode {
+  border-color: #FF8C00;
+}
+
+/* --- TREŚĆ (Musi być nad kropkami) --- */
+.content {
+  position: relative;
+  z-index: 2; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.title {
+  color: var(--color-off-white);
+  font-family: var(--font-header);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Odstępy między polami */
+}
+
+.inputGroup {
+  position: relative;
+  width: 100%;
+}
+
+/* --- EFEKT SZKŁA NA INPUTACH (Glassmorphism Bevel) --- */
+.input {
+  width: 100%;
+  padding: 16px 20px;
+  
+  /* 1. Tło z gradientem imitującym odbicie */
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.08) 0%, 
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  
+  /* 2. Mocne rozmycie tła pod spodem (kropek) */
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px);
+
+  /* 3. Krawędzie 3D - symulacja załamania światła */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+
+  border-radius: 12px;
+  
+  /* 4. Wewnętrzne cienie nadające grubość ("Inset") */
+  box-shadow: 
+    inset 1px 1px 0px rgba(255, 255, 255, 0.15), /* Jasny rant góra/lewo */
+    inset -1px -1px 0px rgba(0, 0, 0, 0.2),      /* Ciemny rant dół/prawo */
+    0 5px 15px rgba(0, 0, 0, 0.2);                /* Cień rzucany na zewnątrz */
+
+  color: var(--color-off-white);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.input::placeholder {
+  color: rgba(200, 210, 230, 0.5);
+  font-weight: 300;
+}
+
+/* Stan Focus - Podświetlenie szkła */
+.input:focus {
+  outline: none;
+  
+  /* Rozjaśnienie szkła */
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  
+  /* Krawędź w kolorze dynamicznym (Złoto/Pomarańcz) */
+  border-color: var(--accent-color);
+  
+  /* Poświata (Glow) */
+  box-shadow: 
+    inset 1px 1px 0px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.1),
+    0 0 15px var(--accent-color-glow),
+    0 0 0 1px var(--accent-color);
+    
+  transform: translateY(-2px);
+}
+
+/* --- PRZYCISK ZATWIERDZANIA --- */
+.submitButton {
+  margin-top: 10px;
+  padding: 14px;
+  width: 100%;
+  
+  border-radius: 50px;
+  border: none;
+  
+  font-family: var(--font-main);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+  
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  /* Dynamiczny kolor tła */
+  background: var(--accent-color);
+  color: var(--color-navy);
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px var(--accent-color-glow);
+  filter: brightness(1.1);
+}
+
+/* --- TEKST PRZEŁĄCZANIA (LOGIN <-> REJESTRACJA) --- */
+.toggleText {
+  margin-top: 25px;
+  color: var(--color-slate);
+  font-size: 0.9rem;
+}
+
+.toggleLink {
+  color: var(--accent-color); /* Dynamiczny kolor */
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: filter 0.3s;
+}
+
+.toggleLink:hover {
+  filter: brightness(1.2);
+  text-decoration: underline;
+}
+
+/* --- PRZYCISK ZAMKNIĘCIA (X) --- */
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: var(--color-slate);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.closeButton:hover {
+  color: var(--color-off-white);
+  transform: rotate(90deg);
+}
+
+/* --- FIX DLA AUTOFILL (CHROME) --- */
+/* Nadpisuje domyślne białe tło przeglądarki przy autouzupełnianiu */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover, 
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-off-white);
+  /* Ustawiamy bardzo ciemne, półprzezroczyste tło */
+  -webkit-box-shadow: 0 0 0px 1000px rgba(10, 25, 47, 0.85) inset;
+  transition: background-color 5000s ease-in-out 0s;
+  border-color: rgba(255, 255, 255, 0.3);
+}

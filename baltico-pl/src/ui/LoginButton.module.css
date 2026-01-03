@@ -1,0 +1,32 @@
+.button {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-blue) 100%);
+  color: var(--color-off-white);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.button:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.button:hover::before {
+  opacity: 1;
+}

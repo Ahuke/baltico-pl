@@ -1,0 +1,138 @@
+/* src/sections/Footer.module.css */
+
+.footer {
+  background-color: var(--color-navy); /* Tło zgodne z resztą strony */
+  border-top: 1px solid rgba(136, 146, 176, 0.1); /* Delikatna linia oddzielająca */
+  padding: 80px 20px 20px;
+  color: var(--color-slate);
+  font-family: var(--font-main);
+  position: relative;
+  z-index: 10;
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+/* --- GÓRNA CZĘŚĆ (KOLUMNY) --- */
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr; /* Logo szersze, linki węższe */
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+/* Kolumna 1: Branding */
+.brandColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logo {
+  font-family: var(--font-header);
+  font-size: 2rem;
+  color: var(--color-off-white);
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: var(--color-turquoise);
+}
+
+.tagline {
+  line-height: 1.6;
+  max-width: 300px;
+  font-size: 0.95rem;
+}
+
+/* Kolumny 2, 3, 4: Linki i Kontakt */
+.columnTitle {
+  color: var(--color-off-white);
+  font-family: var(--font-header);
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link {
+  color: var(--color-slate);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+  font-size: 0.95rem;
+  display: inline-block;
+}
+
+.link:hover {
+  color: var(--color-turquoise);
+  transform: translateX(5px);
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.contactIcon {
+  color: var(--color-gold);
+  margin-top: 4px;
+}
+
+/* --- DOLNA CZĘŚĆ (COPYRIGHT) --- */
+.bottomBar {
+  border-top: 1px solid rgba(136, 146, 176, 0.1);
+  padding-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.legalLinks {
+  display: flex;
+  gap: 20px;
+}
+
+.legalLink {
+  color: var(--color-slate);
+  transition: color 0.3s;
+}
+
+.legalLink:hover {
+  color: var(--color-off-white);
+}
+
+/* --- RESPANSYWNOŚĆ --- */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .bottomBar {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+}

@@ -1,0 +1,413 @@
+/* src/sections/OfferDetailsPage.module.css */
+
+/* GŁÓWNY KONTENER */
+.pageWrapper {
+  background-color: var(--color-navy);
+  color: var(--color-off-white);
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* LINK POWROTU */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  color: var(--color-slate);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: var(--transition-fast);
+  padding: 0.5rem 0;
+}
+
+.backLink:hover {
+  color: var(--color-turquoise);
+  transform: translateX(-5px);
+}
+
+/* --- NAGŁÓWEK --- */
+.header {
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(230, 241, 255, 0.1);
+  padding-bottom: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-header);
+  font-size: 2.5rem;
+  color: var(--color-off-white);
+  margin-bottom: 0.5rem;
+}
+
+.location {
+  font-size: 1.1rem;
+  color: var(--color-turquoise);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+/* --- DYNAMICZNA GALERIA (POPRAWIONA DLA WIĘKSZEJ ILOŚCI ZDJĘĆ) --- */
+.galleryContainer {
+  display: grid;
+  gap: 12px;
+  /* ZWIĘKSZONA WYSOKOŚĆ: Kluczowa zmiana. 
+     Daje więcej miejsca, dzięki czemu zdjęcia w siatkach (layout3, layout5) 
+     nie są tak mocno przycinane w pionie. */
+  height: 550px; 
+  margin-bottom: 3.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Wspólne style dla obrazka */
+.galleryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Wypełnia kafelek, ale zachowuje proporcje */
+  object-position: center center; /* Centruje kadr */
+  cursor: pointer;
+  transition: transform 0.5s ease, filter 0.3s ease;
+  filter: brightness(0.9);
+}
+
+.galleryImage:hover {
+  transform: scale(1.02);
+  filter: brightness(1.05);
+  z-index: 2;
+}
+
+/* UKŁADY SIATKI (GRID LAYOUTS) */
+
+/* 1 zdjęcie: Pełna szerokość */
+.layout1 { grid-template-columns: 1fr; }
+
+/* 2 zdjęcia: Obok siebie połowa na połowę */
+.layout2 { grid-template-columns: 1fr 1fr; }
+
+/* 3 zdjęcia: Lewa duża (główna), prawa kolumna z 2 mniejszymi jeden pod drugim */
+.layout3 { 
+  grid-template-columns: 2fr 1fr; /* Lewa kolumna 2x szersza niż prawa */
+  grid-template-rows: 1fr 1fr;    /* Dwa rzędy równej wysokości */
+}
+/* Pierwsze zdjęcie zajmuje całą lewą kolumnę (oba rzędy) */
+.layout3 img:first-child { grid-row: 1 / -1; }
+
+/* 4 zdjęcia: Siatka 2x2 (Cztery równe kafelki) */
+.layout4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* 5+ zdjęć: "Airbnb style" - Jedno duże po lewej, cztery małe po prawej w siatce 2x2 */
+.layout5 {
+  /* Definiujemy 3 kolumny. Pierwsza dla dużego zdjęcia, dwie kolejne dla małych. */
+  grid-template-columns: 2fr 1fr 1fr; 
+  /* Dwa rzędy równej wysokości */
+  grid-template-rows: 1fr 1fr;      
+}
+/* Pierwsze zdjęcie zajmuje pierwszą kolumnę i oba rzędy */
+.layout5 img:nth-child(1) {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}
+
+/* Mobilna galeria (Slider) */
+@media (max-width: 768px) {
+  .galleryContainer {
+    display: flex;
+    overflow-x: auto;
+    height: 280px; /* Niższa na mobilkach */
+    scroll-snap-type: x mandatory;
+    gap: 0; /* Bez przerw na mobilu */
+  }
+  .galleryImage {
+    min-width: 100%; /* Jedno zdjęcie na cały ekran */
+    scroll-snap-align: center;
+    border-radius: 0;
+    object-fit: contain; /* Na mobilu pokaż całe zdjęcie (może mieć paski, ale widać całość) */
+    background: #000;
+  }
+}
+
+/* --- GRID GŁÓWNY (Opis + Panel) --- */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .contentGrid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+/* LEWA STRONA */
+.descriptionSection {
+  /* ... */
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--color-blue);
+  border-radius: 10px;
+  border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 500;
+  color: var(--color-slate);
+}
+
+.sectionTitle {
+  font-family: var(--font-header);
+  font-size: 1.5rem;
+  color: var(--color-off-white);
+  margin-bottom: 1.2rem;
+  margin-top: 0.5rem;
+  border-left: 3px solid var(--color-turquoise);
+  padding-left: 1rem;
+}
+
+.descriptionText {
+  line-height: 1.8;
+  color: var(--color-slate);
+  font-size: 1.05rem;
+  margin-bottom: 3rem;
+  white-space: pre-line;
+}
+
+.amenitiesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 3rem;
+}
+
+.amenityTag {
+  background: rgba(100, 255, 218, 0.05);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  color: var(--color-turquoise);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.3s;
+}
+
+.amenityTag:hover {
+  background: rgba(100, 255, 218, 0.15);
+}
+
+/* PRAWA STRONA - KARTA REZERWACJI */
+.bookingCardWrapper {
+  position: relative;
+  height: 100%;
+}
+
+.bookingCard {
+  position: sticky;
+  top: 2rem;
+  background: var(--color-blue);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  z-index: 10;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem; /* Większy odstęp */
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.priceLarge {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-off-white);
+}
+
+.priceUnit {
+  color: var(--color-slate);
+  font-size: 1rem;
+}
+
+/* --- ULEPSZONY STYL KALENDARZA (WIĘKSZY I KOLOROWY) --- */
+.datePickerGrid {
+  display: flex;
+  flex-direction: column; /* Jeden pod drugim na kartcie wygląda lepiej przy dużych inputach */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dateInputGroup {
+  position: relative;
+  background: var(--color-navy); /* Ciemne tło pola */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.8rem;
+  padding: 0.8rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.dateInputGroup:hover {
+  border-color: rgba(100, 255, 218, 0.5); /* Hover turkusowy */
+}
+
+/* Stan aktywny (gdy klikamy w input) */
+.dateInputGroup:focus-within {
+  border-color: var(--color-turquoise);
+  box-shadow: 0 0 0 1px var(--color-turquoise);
+  transform: translateY(-2px);
+}
+
+.dateLabel {
+  position: absolute;
+  top: -0.6rem;
+  left: 0.8rem;
+  background: var(--color-blue); /* Tło takie jak karty, żeby przykryć ramkę */
+  padding: 0 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-turquoise); /* Kolor etykiety */
+  letter-spacing: 1px;
+}
+
+/* STYL INPUTA DATY (WIĘKSZY) */
+.dateInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-off-white);
+  font-family: var(--font-main);
+  
+  /* Powiększenie czcionki */
+  font-size: 1.1rem; 
+  font-weight: 500;
+  
+  width: 100%;
+  height: 40px; /* Wysokość klikalna */
+  cursor: pointer;
+  
+  /* Ciemny motyw systemowy */
+  color-scheme: dark; 
+}
+
+/* Ikona kalendarza - ZMIANA KOLORU NA TURKUSOWY */
+.dateInput::-webkit-calendar-picker-indicator {
+  /* Używamy filtra, aby zmienić czarną ikonę na turkusową */
+  /* Sepia + Hue Rotate daje nam kolor zbliżony do turkusu */
+  filter: invert(1) sepia(100%) hue-rotate(130deg) saturate(200%);
+  opacity: 0.8;
+  cursor: pointer;
+  width: 24px;  /* Większa ikona */
+  height: 24px;
+  transition: transform 0.2s;
+}
+
+.dateInput:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  transform: scale(1.2); /* Lekkie powiększenie przy najechaniu */
+}
+
+/* PODSUMOWANIE */
+.summary {
+  background: rgba(10, 25, 47, 0.5);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-slate);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-turquoise);
+}
+
+/* Przycisk rezerwacji */
+.bookButton {
+  width: 100%;
+  margin-top: 1.5rem;
+  background: transparent;
+  border: 1px solid var(--color-turquoise);
+  color: var(--color-turquoise);
+  padding: 1rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  letter-spacing: 1px;
+}
+
+/* Efekt "wypełniania" przycisku (taki sam jak btn-standard) */
+.bookButton::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--color-turquoise);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: -1;
+}
+
+.bookButton:hover {
+  color: var(--color-navy);
+  box-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
+}
+
+.bookButton:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.bookButton:disabled {
+  border-color: var(--color-slate);
+  color: var(--color-slate);
+  cursor: not-allowed;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bookButton:disabled::before {
+  display: none;
+}
