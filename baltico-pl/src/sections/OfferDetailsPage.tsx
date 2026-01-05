@@ -1,9 +1,15 @@
 // src/sections/OfferDetailsPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+// ZMIANA: dodano 'type' przed Variants
 import { motion, type Variants } from 'framer-motion';
-import { cottagesData } from '../data/cottages'; 
+// ZMIANA: dodano 'type' przed Cottage
+import { getCottageById, type Cottage } from './cottageService'; 
 import styles from './OfferDetailsPage.module.css';
+
+interface OfferDetailsPageProps {
+  onOpenAuth?: () => void;
+}
 
 // --- ANIMACJE ---
 const containerVariants: Variants = {
@@ -38,33 +44,37 @@ const parsePrice = (priceStr: string): number => {
   return match ? parseInt(match[0], 10) : 0;
 };
 
-const OfferDetailsPage: React.FC = () => {
+// --- KOMPONENT ---
+const OfferDetailsPage: React.FC<OfferDetailsPageProps> = ({ onOpenAuth }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const cottage = useMemo(() => {
-    return cottagesData.find((c) => c.id === id);
-  }, [id]);
+  const [cottage, setCottage] = useState<Cottage | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // MOCK AUTH STATE
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      setIsLoading(true);
+      const data = await getCottageById(id);
+      setCottage(data);
+      setIsLoading(false);
+    };
+
+    fetchData();
     window.scrollTo(0, 0);
   }, [id]);
 
-  // --- LOGIKA DAT ---
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-
-  // Dzisiejsza data w formacie YYYY-MM-DD (do blokowania przeszłości)
   const today = new Date().toISOString().split('T')[0];
 
-  // Obsługa zmiany daty przyjazdu
   const handleCheckInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCheckIn = e.target.value;
     setCheckIn(newCheckIn);
-
-    // LOGIKA ZABEZPIECZAJĄCA:
-    // Jeśli wybrana data przyjazdu jest późniejsza niż aktualna data wyjazdu,
-    // resetujemy datę wyjazdu (użytkownik musi wybrać ją ponownie).
     if (checkOut && newCheckIn >= checkOut) {
       setCheckOut('');
     }
@@ -75,7 +85,24 @@ const OfferDetailsPage: React.FC = () => {
     e.currentTarget.onerror = null;
   };
 
-  if (!cottage) return null; // (Lub Twój komponent loading/error)
+  if (isLoading) {
+    return (
+      <div className={styles.pageWrapper} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <h2 style={{ color: 'white' }}>Ładowanie oferty...</h2>
+      </div>
+    );
+  }
+
+  if (!cottage) {
+    return (
+      <div className={styles.pageWrapper} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', gap: '20px' }}>
+        <h2 className={styles.title}>Nie znaleziono oferty</h2>
+        <button onClick={() => navigate('/offers')} className={styles.bookButton} style={{ maxWidth: '200px' }}>
+          Wróć do listy
+        </button>
+      </div>
+    );
+  }
 
   const basePrice = parsePrice(cottage.price);
 
@@ -102,6 +129,25 @@ const OfferDetailsPage: React.FC = () => {
   else if (count === 3) galleryClass = styles.layout3;
   else if (count === 4) galleryClass = styles.layout4;
   else if (count >= 5) { galleryClass = styles.layout5; imagesToShow = validImages.slice(0, 5); }
+
+  // --- HANDLERY ---
+
+  const handleGuestReserve = () => {
+    alert(`[TRYB GOŚCIA]\nPrzechodzę do płatności.\nObiekt: ${cottage.title}\nCena: ${totalPrice} PLN`);
+  };
+
+  const handleLoginAndReserve = () => {
+    if (onOpenAuth) {
+      onOpenAuth(); 
+      console.log("Otwieram modal logowania...");
+    } else {
+      alert("Funkcja logowania niedostępna");
+    }
+  };
+
+  const handleUserReserve = () => {
+    alert(`[ZALOGOWANY UŻYTKOWNIK]\nRezerwuję jako: Jan Kowalski\nObiekt: ${cottage.title}\nCena: ${totalPrice} PLN`);
+  };
 
   return (
     <motion.div 
@@ -137,14 +183,27 @@ const OfferDetailsPage: React.FC = () => {
               <span className={styles.statItem}>💎 Premium</span>
             </div>
             <h2 className={styles.sectionTitle}>O tym miejscu</h2>
-            <p className={styles.descriptionText}>{cottage.description}<br/><br/>Wnętrze zostało zaprojektowane z myślą o najwyższym komforcie...</p>
+            <p className={styles.descriptionText}>{cottage.description}</p>
             <h2 className={styles.sectionTitle}>Udogodnienia</h2>
             <div className={styles.amenitiesList}>
               {cottage.features.map((f, i) => <div key={i} className={styles.amenityTag}>✓ {f}</div>)}
             </div>
+            
+            <div style={{ marginTop: '50px', padding: '20px', border: '1px dashed #444', borderRadius: '10px', background: 'rgba(0,0,0,0.2)' }}>
+              <h4 style={{marginBottom: '10px', color: '#888', fontSize: '0.8rem', textTransform: 'uppercase'}}>🔧 Panel Deweloperski</h4>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ccc' }}>
+                <input 
+                  type="checkbox" 
+                  checked={isLoggedIn} 
+                  onChange={(e) => setIsLoggedIn(e.target.checked)} 
+                />
+                Symuluj bycie zalogowanym
+              </label>
+            </div>
+
           </motion.div>
 
-          {/* PRAWA STRONA - KARTA REZERWACJI */}
+          {/* PRAWA STRONA */}
           <motion.div className={styles.bookingCardWrapper} variants={itemVariants}>
             <div className={styles.bookingCard}>
               
@@ -156,49 +215,28 @@ const OfferDetailsPage: React.FC = () => {
                 <div style={{ color: 'var(--color-gold)' }}>★ 4.9 <span style={{color:'var(--color-slate)'}}>(18)</span></div>
               </div>
 
-              {/* ULEPSZONE INPUTY DATY */}
               <div className={styles.datePickerGrid}>
-                
-                {/* CHECK-IN */}
                 <div className={styles.dateInputGroup}>
                   <label className={styles.dateLabel}>Przyjazd</label>
-                  <input 
-                    type="date" 
-                    className={styles.dateInput}
-                    value={checkIn}
-                    min={today} // Blokada dat przeszłych
-                    onChange={handleCheckInChange}
-                  />
+                  <input type="date" className={styles.dateInput} value={checkIn} min={today} onChange={handleCheckInChange} />
                 </div>
-
-                {/* CHECK-OUT */}
                 <div className={styles.dateInputGroup}>
                   <label className={styles.dateLabel}>Wyjazd</label>
                   <input 
                     type="date" 
-                    className={styles.dateInput}
-                    value={checkOut}
-                    // KLUCZOWE: Minimum to data przyjazdu (lub dzisiaj, jeśli brak przyjazdu)
-                    min={checkIn ? checkIn : today}
-                    // Jeśli nie wybrano daty przyjazdu, blokujemy pole wyjazdu (UX optional)
+                    className={styles.dateInput} 
+                    value={checkOut} 
+                    min={checkIn ? checkIn : today} 
                     disabled={!checkIn}
                     style={{ opacity: !checkIn ? 0.5 : 1, cursor: !checkIn ? 'not-allowed' : 'pointer' }}
-                    onChange={(e) => setCheckOut(e.target.value)}
+                    onChange={(e) => setCheckOut(e.target.value)} 
                   />
                 </div>
               </div>
 
               {nightsCount > 0 ? (
-                <motion.div 
-                  className={styles.summary}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                >
-                  <div className={styles.summaryRow}>
-                    <span>{basePrice} zł x {nightsCount} noce</span>
-                    <span>{totalPrice} zł</span>
-                  </div>
-                  <div className={styles.summaryRow}><span>Serwis</span><span>0 zł</span></div>
+                <motion.div className={styles.summary} initial={{opacity:0}} animate={{opacity:1}}>
+                  <div className={styles.summaryRow}><span>{basePrice} zł x {nightsCount} noce</span><span>{totalPrice} zł</span></div>
                   <div className={styles.totalRow}><span>Razem</span><span>{totalPrice} zł</span></div>
                 </motion.div>
               ) : (
@@ -207,13 +245,35 @@ const OfferDetailsPage: React.FC = () => {
                 </div>
               )}
 
-              <button 
-                className={styles.bookButton}
-                disabled={nightsCount <= 0}
-                onClick={() => alert(`Rezerwacja: ${cottage.title} (${checkIn} - ${checkOut})`)}
-              >
-                {nightsCount > 0 ? 'Rezerwuj teraz' : 'Sprawdź dostępność'}
-              </button>
+              <div className={styles.buttonsContainer}>
+                {isLoggedIn ? (
+                  <button 
+                    className={styles.btnPrimary}
+                    disabled={nightsCount <= 0}
+                    onClick={handleUserReserve}
+                  >
+                    {nightsCount > 0 ? 'Rezerwuj teraz' : 'Sprawdź dostępność'}
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      className={styles.btnPrimary}
+                      disabled={nightsCount <= 0}
+                      onClick={handleLoginAndReserve}
+                    >
+                      Zaloguj i zarezerwuj
+                    </button>
+                    
+                    <button 
+                      className={styles.btnSecondary}
+                      disabled={nightsCount <= 0}
+                      onClick={handleGuestReserve}
+                    >
+                      Rezerwuj jako gość
+                    </button>
+                  </>
+                )}
+              </div>
 
             </div>
           </motion.div>
