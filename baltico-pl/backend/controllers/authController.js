@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import pool from '../config/db.js';
+import supabase from '../config/db.js';
 
 const SALT_ROUNDS = 10;
 
@@ -31,43 +31,52 @@ export const register = async (req, res) => {
     }
 
     // Check if user already exists
-    const userExists = await pool.query(
-      'SELECT * FROM "Users" WHERE "Email" = $1',
-      [email]
-    );
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-    if (userExists.rows.length > 0) {
+    if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Insert new user
-    const result = await pool.query(
-      `INSERT INTO "Users" ("Email", "Password", "First_name", "Last_name", "Phone") 
-       VALUES ($1, $2, $3, $4, $5) 
-       RETURNING "ID", "Email", "First_name", "Last_name", "Phone"`,
-      [email, hashedPassword, first_name, last_name, phone || null]
-    );
+    // Insert user into database
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert([{
+        email: email,
+        password: hashedPassword,
+        first_name: first_name,
+        last_name: last_name,
+        phone: phone || null
+      }])
+      .select()
+      .single();
 
-    const newUser = result.rows[0];
+    if (insertError) {
+      console.error('Insert error:', insertError);
+      return res.status(500).json({ error: 'Failed to create user' });
+    }
     const token = generateToken({
-      id: newUser.ID,
-      email: newUser.Email,
-      first_name: newUser.First_name,
-      last_name: newUser.Last_name
+      id: newUser.id,
+      email: newUser.email,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name
     });
 
     res.status(201).json({
       message: 'User registered successfully',
       token,
       user: {
-        id: newUser.ID,
-        email: newUser.Email,
-        first_name: newUser.First_name,
-        last_name: newUser.Last_name,
-        phone: newUser.Phone
+        id: newUser.id,
+        email: newUser.email,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
+        phone: newUser.phone
       }
     });
 
@@ -87,20 +96,19 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Find user by email
-    const result = await pool.query(
-      'SELECT * FROM "Users" WHERE "Email" = $1',
-      [email]
-    );
+    // Fetch user from database
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-    if (result.rows.length === 0) {
+    if (fetchError || !user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const user = result.rows[0];
-
     // Compare password with hashed password
-    const isPasswordValid = await bcrypt.compare(password, user.Password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -108,21 +116,21 @@ export const login = async (req, res) => {
 
     // Generate token
     const token = generateToken({
-      id: user.ID,
-      email: user.Email,
-      first_name: user.First_name,
-      last_name: user.Last_name
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name
     });
 
     res.json({
       message: 'Login successful',
       token,
       user: {
-        id: user.ID,
-        email: user.Email,
-        first_name: user.First_name,
-        last_name: user.Last_name,
-        phone: user.Phone
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone
       }
     });
 
@@ -135,25 +143,24 @@ export const login = async (req, res) => {
 // GET /auth/me
 export const getCurrentUser = async (req, res) => {
   try {
-    // req.user is set by authenticateToken middleware
-    const result = await pool.query(
-      'SELECT "ID", "Email", "First_name", "Last_name", "Phone" FROM "Users" WHERE "ID" = $1',
-      [req.user.id]
-    );
+    // Fetch user from database
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('id, email, first_name, last_name, phone')
+      .eq('id', req.user.id)
+      .single();
 
-    if (result.rows.length === 0) {
+    if (fetchError || !user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const user = result.rows[0];
-
     res.json({
       user: {
-        id: user.ID,
-        email: user.Email,
-        first_name: user.First_name,
-        last_name: user.Last_name,
-        phone: user.Phone
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone
       }
     });
 
