@@ -2,6 +2,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import gsap from 'gsap';
 import { DotGrid } from '../ui/DotGrid';
+import { useAuth } from '../context/AuthContext';
 import styles from './AuthModal.module.css';
 
 interface AuthModalProps {
@@ -11,6 +12,19 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string>('');
+  const { login, register } = useAuth();
+  
+  // Stan formularza
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    first_name: '',
+    last_name: '',
+    phone: ''
+  });
   
   // Referencje do elementów DOM dla GSAP
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -82,17 +96,63 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   }, [isLogin, isOpen]);
 
   // Symulacja wysłania formularza
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLogin) {
-      // Rejestracja
-      alert("Rejestracja udana! Witamy w Baltico.");
-      setIsLogin(true); // Powrót do logowania
-    } else {
-      // Logowanie
-      console.log("Logowanie...");
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      if (!isLogin) {
+        // Rejestracja
+        if (formData.password !== formData.confirmPassword) {
+          setError('Hasła nie są identyczne');
+          setIsSubmitting(false);
+          return;
+        }
+
+        await register({
+          email: formData.email,
+          password: formData.password,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          phone: formData.phone || undefined
+        });
+
+        alert('Rejestracja udana! Witamy w Baltico.');
+        handleClose();
+      } else {
+        // Logowanie
+        await login(formData.email, formData.password);
+        alert('Zalogowano pomyślnie!');
+        handleClose();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd');
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  // Obsługa zmiany w polach formularza
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Reset formularza przy przełączaniu trybu
+  useEffect(() => {
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      first_name: '',
+      last_name: '',
+      phone: ''
+    });
+    setError('');
+  }, [isLogin]);
 
   if (!isOpen) return null;
 
@@ -123,34 +183,101 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
           <form className={styles.form} onSubmit={handleSubmit} ref={formRef}>
             
+            {/* Komunikat o błędzie */}
+            {error && (
+              <div style={{
+                background: '#ff4444',
+                color: 'white',
+                padding: '10px',
+                borderRadius: '5px',
+                marginBottom: '15px',
+                fontSize: '14px'
+              }}>
+                {error}
+              </div>
+            )}
+
             {/* Pola widoczne tylko przy rejestracji */}
             {!isLogin && (
               <>
                 <div className={styles.inputGroup}>
-                  <input type="text" placeholder="Imię" className={styles.input} required />
+                  <input 
+                    type="text" 
+                    name="first_name"
+                    placeholder="Imię" 
+                    className={styles.input} 
+                    value={formData.first_name}
+                    onChange={handleInputChange}
+                    required 
+                  />
                 </div>
                 <div className={styles.inputGroup}>
-                  <input type="tel" placeholder="Numer telefonu" className={styles.input} required />
+                  <input 
+                    type="text" 
+                    name="last_name"
+                    placeholder="Nazwisko" 
+                    className={styles.input} 
+                    value={formData.last_name}
+                    onChange={handleInputChange}
+                    required 
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <input 
+                    type="tel" 
+                    name="phone"
+                    placeholder="Numer telefonu (opcjonalnie)" 
+                    className={styles.input}
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </>
             )}
 
             <div className={styles.inputGroup}>
-              <input type="email" placeholder="Adres e-mail" className={styles.input} required />
+              <input 
+                type="email" 
+                name="email"
+                placeholder="Adres e-mail" 
+                className={styles.input}
+                value={formData.email}
+                onChange={handleInputChange}
+                required 
+              />
             </div>
 
             <div className={styles.inputGroup}>
-              <input type="password" placeholder="Hasło" className={styles.input} required />
+              <input 
+                type="password" 
+                name="password"
+                placeholder="Hasło" 
+                className={styles.input}
+                value={formData.password}
+                onChange={handleInputChange}
+                required 
+              />
             </div>
 
             {!isLogin && (
               <div className={styles.inputGroup}>
-                <input type="password" placeholder="Powtórz hasło" className={styles.input} required />
+                <input 
+                  type="password" 
+                  name="confirmPassword"
+                  placeholder="Powtórz hasło" 
+                  className={styles.input}
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required 
+                />
               </div>
             )}
 
-            <button type="submit" className={styles.submitButton}>
-              {isLogin ? 'Zaloguj się' : 'Zarejestruj się'}
+            <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+              {isSubmitting 
+                ? 'Przetwarzanie...' 
+                : (isLogin ? 'Zaloguj się' : 'Zarejestruj się')
+              }
             </button>
           </form>
 
