@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-dotenv
+
+PS C:\Users\gracj\Desktop\Projetk\baltico-pl\baltico-pl\Backend> uvicorn main:app --reload
+PS C:\Users\gracj\Desktop\Projetk\baltico-pl\baltico-pl> npm run dev

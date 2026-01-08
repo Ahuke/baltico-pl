@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 // ZMIANA: dodano 'type' przed Variants
 import { motion, type Variants } from 'framer-motion';
 // ZMIANA: dodano 'type' przed Cottage
-import { getCottageById, type Cottage } from './cottageService'; 
+import { getCottageById, createReservation, type Cottage } from './cottageService';
 import styles from './OfferDetailsPage.module.css';
 
 interface OfferDetailsPageProps {
@@ -145,9 +145,27 @@ const OfferDetailsPage: React.FC<OfferDetailsPageProps> = ({ onOpenAuth }) => {
     }
   };
 
-  const handleUserReserve = () => {
-    alert(`[ZALOGOWANY UŻYTKOWNIK]\nRezerwuję jako: Jan Kowalski\nObiekt: ${cottage.title}\nCena: ${totalPrice} PLN`);
-  };
+// src/sections/OfferDetailsPage.tsx
+
+const handleUserReserve = async () => {
+    if (!checkIn || !checkOut || !cottage) return;
+
+    try {
+      const result = await createReservation({
+        cottage_id: cottage.id,
+        user_id: 1, 
+        start_date: checkIn, 
+        end_date: checkOut
+        // ----------------------
+      });
+
+      alert(`✅ Rezerwacja udana! Koszt: ${result.total_price} PLN`);
+      console.log("Potwierdzenie z backendu:", result);
+
+    } catch (error: any) {
+      alert(`❌ Błąd: ${error.message}`);
+    }
+};
 
   return (
     <motion.div 

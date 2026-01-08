@@ -86,3 +86,36 @@ export const getCottageById = async (id: string): Promise<Cottage | null> => {
     features: data.cottage_features ? data.cottage_features.map((cf: any) => cf.features.feature) : []
   };
 };
+
+// src/cottageService.ts
+
+const API_URL = "http://127.0.0.1:8000"; // Adres Twojego Backendu
+
+// Interfejs danych, które wysyłamy do rezerwacji
+export interface BookingRequest {
+  cottage_id: string;
+  user_id: number; // Backend oczekuje liczby (integer)
+  start_date: string; // Format 'YYYY-MM-DD'
+  end_date: string;   // Format 'YYYY-MM-DD'
+}
+
+export const createReservation = async (bookingData: BookingRequest) => {
+  console.log("🚀 Wysyłam rezerwację do Python backendu:", bookingData);
+
+  const response = await fetch(`${API_URL}/api/bookings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bookingData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    // Jeśli backend zwróci błąd (np. "Termin zajęty"), rzucamy go dalej
+    throw new Error(data.detail || 'Wystąpił błąd podczas rezerwacji');
+  }
+
+  return data; // Zwracamy sukces (np. { status: "success", total_price: 1200 })
+};
